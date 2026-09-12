@@ -16,6 +16,17 @@ def add_section(title, paragraphs):
     for p in paragraphs:
         doc.add_paragraph(p)
 
+
+def add_subsection(title, paragraphs=None, bullets=None):
+    doc.add_heading(title, level=3)
+    if paragraphs:
+        for p in paragraphs:
+            doc.add_paragraph(p)
+    if bullets:
+        for item in bullets:
+            p = doc.add_paragraph(style="List Bullet")
+            p.add_run(item)
+
 add_section(
     "1. Introducción",
     [
@@ -63,13 +74,76 @@ add_section(
 add_section(
     "5. Primitivas criptográficas",
     [
-        "Las primitivas criptográficas son los bloques básicos sobre los que se construyen sistemas más complejos. Entre las más importantes están el cifrado, las funciones hash, los MAC, las firmas digitales y el intercambio o acuerdo de claves.",
-        "5.1 Cifrado: transforma un mensaje M con una clave K en un texto cifrado C, de modo que el mensaje original pueda recuperarse solo con la clave correcta.",
-        "5.2 Funciones hash: toman un mensaje M y producen un valor H(M) de longitud fija. Sirven para construir mecanismos de integridad y otros sistemas criptográficos.",
-        "5.3 MAC: un código de autenticación de mensajes permite verificar la integridad y autenticidad del mensaje para alguien que comparte la clave secreta. Es muy útil cuando se necesita comprobar que el mensaje no ha sido modificado por un atacante y que procede de un interlocutor autorizado.",
-        "5.4 Firmas digitales: permiten verificar que un mensaje fue firmado con la clave privada correspondiente y que no ha sido alterado desde su firma.",
-        "5.5 Intercambio de claves: protocolos como Diffie-Hellman permiten establecer un secreto compartido sin transmitir directamente ese secreto por el canal.",
-        "Estas primitivas forman la base de mecanismos más complejos como TLS, certificados digitales y protocolos seguros de comunicación."
+        "Las primitivas criptográficas son los bloques básicos sobre los que se construyen sistemas más complejos. Entenderlas es esencial, porque todas las soluciones reales de seguridad (TLS, certificados, firma digital, almacenamiento seguro, autenticación, cifrado de datos) se apoyan en estas ideas.",
+        "Una forma clara de organizarlas es distinguir entre cinco tipos principales: cifrado, funciones hash, MAC, firmas digitales e intercambio de claves."
+    ],
+)
+
+add_subsection(
+    "5.1 Cifrado",
+    paragraphs=[
+        "El cifrado transforma un mensaje M con una clave K en un texto cifrado C. La idea principal es que solo alguien que conozca la clave correcta pueda recuperar el contenido original.",
+        "El objetivo principal del cifrado es la confidencialidad: impedir que un atacante comprenda el contenido del mensaje aunque lo intercepte."
+    ],
+    bullets=[
+        "Se usa para ocultar el contenido del mensaje desde el punto de vista del atacante.",
+        "En la criptografía simétrica, se usa la misma clave para cifrar y descifrar.",
+        "En la asimétrica, se usa la clave pública del destinatario para cifrar y su clave privada para descifrar."
+    ],
+)
+
+add_subsection(
+    "5.2 Funciones hash",
+    paragraphs=[
+        "Una función hash transforma cualquier entrada en una salida de longitud fija, conocida como digest o valor hash. El proceso es determinista y no reversible en la práctica."
+    ],
+    bullets=[
+        "Se usan para verificar integridad de archivos, mensajes y contraseñas.",
+        "Si cambia un solo bit del contenido original, el hash cambia de forma muy distinta.",
+        "No permiten recuperar el mensaje original a partir del valor hash."
+    ],
+)
+
+add_subsection(
+    "5.3 MAC (Message Authentication Code)",
+    paragraphs=[
+        "Un MAC permite comprobar la integridad y la autenticidad de un mensaje entre dos entidades que comparten una clave secreta. Es decir, confirma que el mensaje no ha sido modificado y que procede de quien posee la clave compartida."
+    ],
+    bullets=[
+        "Se utiliza cuando existe una clave compartida entre emisor y receptor.",
+        "Protege frente a modificaciones no autorizadas del mensaje.",
+        "No es lo mismo que una firma digital, porque la verificación exige compartir la clave secreta."
+    ],
+)
+
+add_subsection(
+    "5.4 Firmas digitales",
+    paragraphs=[
+        "Una firma digital permite demostrar que un mensaje ha sido firmado por la persona que afirma ser su autor y que el contenido no ha sido alterado desde la firma. Se basa en un par de claves: pública y privada."
+    ],
+    bullets=[
+        "La clave privada firma el mensaje o su resumen.",
+        "La clave pública valida la firma.",
+        "Proporcionan autenticidad, integridad y, en muchos contextos, no repudio."
+    ],
+)
+
+add_subsection(
+    "5.5 Intercambio o acuerdo de claves",
+    paragraphs=[
+        "El intercambio o acuerdo de claves permite que dos partes establezcan un secreto compartido sin enviar ese secreto directamente por el canal de comunicación."
+    ],
+    bullets=[
+        "Diffie-Hellman es el ejemplo clásico de protocolo de acuerdo de claves.",
+        "Ambas partes calculan un valor común sin revelarlo en claro.",
+        "En la práctica, se combina con autenticación para evitar ataques de intermediario."
+    ],
+)
+
+add_section(
+    "Resumen práctico",
+    [
+        "El cifrado protege la confidencialidad del contenido; los hashes ayudan a detectar cambios; los MAC autentican mensajes compartiendo una clave; las firmas digitales permiten demostrar origen e integridad; y el acuerdo de claves permite crear secretos compartidos sin enviarlos directamente."
     ],
 )
 
@@ -233,7 +307,7 @@ add_section(
         "¿Por qué no basta con cifrar un mensaje si no se autentica al interlocutor?",
         "¿Qué diferencia hay entre confidencialidad e integridad?",
         "¿Qué problema resuelve Diffie-Hellman y qué limita en su versión básica?",
-        "¿Por qué la gestión de claves y no ces es crítica en protocolos modernos?",
+        "¿Por qué la gestión de claves y nonces es crítica en protocolos modernos?",
         "¿Qué papel juega la firma digital en la seguridad de documentos y transacciones?",
         "¿Qué ocurre si se reutiliza una clave o un nonce en un esquema como AES-GCM?"
     ],

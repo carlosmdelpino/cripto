@@ -1,607 +1,361 @@
 # Sesión 1. Fundamentos de la criptografía
 
+*Introducción a la criptografía: fundamentos, modelo de amenaza y criptografía moderna*
+
 ## Índice
 
 - [1. Introducción](#1-introducción)
-- [2. Objetivos de la sesión](#2-objetivos-de-la-sesión)
+- [2. Modelo de amenaza: Alice, Bob y Eve](#2-modelo-de-amenaza-alice-bob-y-eve)
 - [3. Objetivos de la seguridad de la información](#3-objetivos-de-la-seguridad-de-la-información)
 - [4. ¿Qué es la criptografía?](#4-qué-es-la-criptografía)
-- [5. Tipos de criptografía](#5-tipos-de-criptografía)
-- [6. Conceptos básicos de la criptografía](#6-conceptos-básicos-de-la-criptografía)
-- [7. Fundamentos matemáticos básicos](#7-fundamentos-matemáticos-básicos)
-- [8. Métodos criptográficos modernos: RSA y ECC](#8-métodos-criptográficos-modernos-rsa-y-ecc)
-- [9. Ejemplos prácticos](#9-ejemplos-prácticos)
-- [10. Ejercicios propuestos con soluciones](#10-ejercicios-propuestos-con-soluciones)
-- [11. Ejemplo sencillo de cálculo con Python](#11-ejemplo-sencillo-de-cálculo-con-python)
-- [12. Importancia de la seguridad en la era digital](#12-importancia-de-la-seguridad-en-la-era-digital)
-- [13. Errores habituales en la práctica](#13-errores-habituales-en-la-práctica)
-- [14. Conclusiones](#14-conclusiones)
-- [15. Bibliografía esencial](#15-bibliografía-esencial)
-- [16. Bibliografía recomendada](#16-bibliografía-recomendada)
-- [17. Preguntas de reflexión](#17-preguntas-de-reflexión)
-- [18. Actividad recomendada para el aula](#18-actividad-recomendada-para-el-aula)
+- [5. Primitivas criptográficas](#5-primitivas-criptográficas)
+- [6. Hash frente a cifrado](#6-hash-frente-a-cifrado)
+- [7. Criptografía simétrica](#7-criptografía-simétrica)
+- [8. Criptografía asimétrica](#8-criptografía-asimétrica)
+- [9. Firmas digitales y la explicación correcta](#9-firmas-digitales-y-la-explicación-correcta)
+- [10. Diffie-Hellman y el acuerdo de claves](#10-diffie-hellman-y-el-acuerdo-de-claves)
+- [11. Fundamentos matemáticos para la criptografía](#11-fundamentos-matemáticos-para-la-criptografía)
+- [12. Ejemplo didáctico de RSA](#12-ejemplo-didáctico-de-rsa)
+- [13. Ejemplos prácticos](#13-ejemplos-prácticos)
+- [14. Ejercicios propuestos](#14-ejercicios-propuestos)
+- [15. Python como apoyo didáctico](#15-python-como-apoyo-didáctico)
+- [16. Importancia de la seguridad digital](#16-importancia-de-la-seguridad-digital)
+- [17. Errores comunes y buenas prácticas](#17-errores-comunes-y-buenas-prácticas)
+- [18. Conclusiones](#18-conclusiones)
+- [19. Bibliografía esencial](#19-bibliografía-esencial)
+- [20. Bibliografía recomendada](#20-bibliografía-recomendada)
+- [21. Preguntas de reflexión](#21-preguntas-de-reflexión)
+
+---
 
 ## 1. Introducción
 
-La criptografía es la disciplina que se encarga de proteger la información para que pueda viajar, almacenarse o procesarse sin que terceros no autorizados puedan acceder a su contenido o alterarlo. El término proviene del griego *kryptós* (“oculto”) y *gráphein* (“escribir”), y su historia está estrechamente ligada al desarrollo de la seguridad de la información.
+La criptografía es una disciplina de la seguridad de la información que tiene como finalidad proteger la confidencialidad, la integridad, la autenticación y la autenticidad de la información cuando se transmite o se almacena en entornos potencialmente inseguros.
 
-En la práctica, la criptografía aparece en casi todos los servicios digitales que utilizamos: navegación web segura, banca online, autenticación de usuarios, comunicaciones móviles, almacenamiento en la nube y firma de documentos electrónicos. Sin ella, gran parte del ecosistema digital no sería confiable.
+No consiste únicamente en ocultar mensajes. La criptografía moderna estudia técnicas matemáticas y protocolos para proporcionar propiedades de seguridad incluso cuando los sistemas se comunican a través de canales controlados por un atacante.
+
+Desde la antigüedad hasta la actualidad, la necesidad de ocultar información y verificar la identidad de los interlocutores ha sido una preocupación constante. En la práctica digital, la criptografía aparece en la navegación web, en la banca online, en la firma de documentos, en la autenticación de usuarios y en la protección de datos en la nube.
+
+La seguridad de la información no depende solo del ocultamiento del contenido, sino también del control del acceso, la autenticación de las entidades, la verificación de la integridad y la posibilidad de acreditar la procedencia de un mensaje.
 
 **Fecha de referencia:** XX-YY-ZZZZ
 
 ---
 
-## 2. Objetivos de la sesión
+## 2. Modelo de amenaza: Alice, Bob y Eve
 
-Al finalizar esta sesión, el estudiante será capaz de:
+Antes de estudiar algoritmos, es necesario entender el escenario de seguridad. En un modelo clásico, Alice quiere enviar un mensaje a Bob a través de un canal que puede ser inseguro, mientras que Eve representa a un atacante que puede escuchar, modificar, inyectar o eliminar mensajes.
 
-• comprender qué es la criptografía y por qué es esencial en la seguridad digital.
-• identificar los objetivos básicos de la seguridad de la información.
-• distinguir entre criptografía simétrica, asimétrica e híbrida.
-• reconocer los conceptos de clave, función hash, firma digital y cifrado.
-• aplicar razonamientos simples de seguridad a escenarios cotidianos.
-• interpretar algunos fundamentos matemáticos que sustentan la criptografía moderna.
+Existen dos tipos principales de atacante:
+
+- **Atacante pasivo**: escucha el canal sin alterar los mensajes.
+- **Atacante activo**: puede interceptar el tráfico, modificar contenido, repetir mensajes previamente capturados o suplantar identidades.
+
+Esto da lugar al **ataque de intermediario o MITM**, en el que Alice cree que habla con Bob y Bob cree que habla con Alice, pero Eve controla el canal de comunicación. Este tipo de ataque explica por qué no basta con cifrar el mensaje: también es necesario autenticar a las entidades y proteger la integridad del flujo de datos.
+
+La seguridad computacional es diferente de la seguridad absoluta. En la práctica, se acepta que un sistema es seguro si un atacante con recursos razonables no puede romperlo de forma práctica. Es decir, la seguridad se fundamenta en problemas computacionalmente difíciles y en la correcta gestión de los mecanismos criptográficos.
 
 ---
 
 ## 3. Objetivos de la seguridad de la información
 
-La criptografía no solo sirve para ocultar mensajes; también proporciona una base para garantizar atributos esenciales del sistema. Los más importantes son los siguientes:
+Los objetivos de la seguridad suelen describirse de la siguiente forma:
 
-### 3.1 Confidencialidad
+- **Confidencialidad**: ¿quién puede leer el mensaje? La información solo puede ser entendida por quienes están autorizados para acceder a ella.
+- **Integridad**: ¿ha sido modificado? El contenido no debe cambiar ni durante la transmisión ni durante el almacenamiento.
+- **Autenticación de entidad**: ¿con quién estoy hablando? Debe verificarse la identidad de la entidad que aparece en la comunicación.
+- **Autenticación de mensaje**: ¿quién generó este mensaje? Debe poder determinarse si el mensaje procede de la entidad que afirma ser su origen.
+- **No repudio**: ¿puede una parte negar la autoría o recepción de un mensaje? Esto depende no solo de la criptografía, sino también del protocolo, la gestión de claves y el contexto legal.
 
-- La confidencialidad busca garantizar que la información solo pueda ser leída por las personas autorizadas.
-- Si un atacante intercepta un canal de comunicación, no debería poder entender el contenido.
-
-**Ejemplo**: un correo electrónico con contenido bancario debe llegar a su destinatario sin que un tercero pueda leer su contenido.
-
-### 3.2 Integridad
-
-- La integridad implica que los datos no hayan sido alterados ni manipulados durante la transmisión o almacenamiento.
-- Esto permite detectar cambios no autorizados en archivos, mensajes o transacciones.
-
-**Ejemplo**: si un archivo de configuración se modifica sin autorización, el sistema debe detectar que algo ha cambiado.
-
-### 3.3 Autenticación
-
-- La autenticación verifica la identidad de quien envía o recibe la información.
-- Permite comprobar si la entidad que parece ser el emisor realmente lo es.
-
-**Ejemplo**: acceder a una aplicación con usuario y contraseña, o verificar que un certificado digital corresponde a un servidor real.
-
-### 3.4 No repudio
-
-- El no repudio evita que una parte niegue haber enviado o recibido un mensaje.
-- Es importante en procedimientos legales, transacciones y comunicaciones corporativas.
-
-**Ejemplo**: un cliente no puede reclamar que nunca solicitó una transferencia si esa solicitud fue firmada digitalmente.
-
-> En resumen, la seguridad de la información se apoya en cuatro pilares fundamentales: confidencialidad, integridad, autenticación y no repudio.
-
-### 3.5 Objetivos complementarios
-
-- La disponibilidad es un objetivo general de la seguridad, aunque no sea una propiedad proporcionada directamente por la criptografía.
-- El control de acceso no debe confundirse con la criptografía, aunque ambos son pilares de la seguridad global del sistema.
+Además, la disponibilidad es un objetivo general de la seguridad, aunque no sea una propiedad que proporcione directamente la criptografía. El control de acceso tampoco debe confundirse con la criptografía, aunque ambas son componentes esenciales de la seguridad de un sistema.
 
 ---
 
 ## 4. ¿Qué es la criptografía?
 
-La criptografía es el conjunto de técnicas y procedimientos que transforman la información para hacerla incomprensible para quien no conoce la clave o el procedimiento correcto de recuperación.
+La criptografía es el conjunto de técnicas matemáticas y protocolos diseñados para proporcionar propiedades de seguridad como confidencialidad, integridad, autenticación y no repudio, incluso en entornos adversariales.
 
-El modelo clásico de comunicación segura puede resumirse así:
+Su campo de estudio incluye el cifrado, las funciones hash, los códigos de autenticación de mensajes, las firmas digitales, los protocolos de intercambio de claves y la gestión segura de las claves.
 
-• el emisor convierte el mensaje original en texto cifrado.
-• el mensaje se transmite por un canal que puede ser inseguro.
-• el receptor aplica la operación inversa con la clave apropiada.
-• se recupera el contenido original.
+Desde un punto de vista operativo, la criptografía transforma un mensaje original en una representación protegida, presenta la información a través de un canal inseguro y recupera el contenido original solo con la clave o el procedimiento apropiado.
 
-### Esquema general
-
-```text
-Mensaje original  ->  Cifrado  ->  Canal de comunicación  ->  Descifrado  ->  Mensaje original
-```
-
-- En un sistema fiable, la seguridad depende no solo del algoritmo, sino también de la robustez de la clave y de la forma en que se gestiona.
-- La criptografía moderna no consiste solamente en ocultar información, sino en garantizar propiedades de confianza en sistemas adversariales.
-
-### 4.1 Criptografía y seguridad
-
-La criptografía es una herramienta fundamental dentro del marco más amplio de la seguridad informática. No sustituye otros mecanismos, sino que los complementa. Por ejemplo:
-
-• control de acceso.
-• autenticación multifactor.
-• firewalls.
-• monitorización de red.
-• educación del usuario.
-• gestión de incidentes.
-
-La criptografía actúa como capa de protección para los datos y las comunicaciones.
+En la práctica, la seguridad de un sistema no depende solo del algoritmo elegido. También influyen la gestión de claves, la longitud de la clave, la aleatoriedad, la implementación, los protocolos y la correcta elección de parámetros como nonces o vectores de inicialización.
 
 ---
 
-## 5. Tipos de criptografía
+## 5. Primitivas criptográficas
 
-La criptografía se clasifica normalmente en tres grandes grupos: simétrica, asimétrica e híbrida.
+Las primitivas criptográficas son los bloques básicos sobre los que se construyen sistemas más complejos. Entenderlas es esencial, porque todas las soluciones reales de seguridad (TLS, certificados, firma digital, almacenamiento seguro, autenticación, cifrado de datos) se apoyan en estas ideas.
 
-### 5.1 Criptografía simétrica
+Una forma clara de organizarlas es distinguir entre cinco tipos principales: cifrado, funciones hash, MAC, firmas digitales e intercambio de claves.
 
-• En la criptografía simétrica, el mismo secreto se usa tanto para cifrar como para descifrar.
-• Es la opción más eficiente para proteger grandes volúmenes de datos.
+### 5.1 Cifrado
 
-**Ventajas:**
-- es muy rápida;
-- tiene un bajo coste computacional;
-- suele ser apropiada para cifrar grandes cantidades de datos.
+El cifrado transforma un mensaje M con una clave K en un texto cifrado C. La idea principal es que solo alguien que conozca la clave correcta pueda recuperar el contenido original. El objetivo principal del cifrado es la **confidencialidad**: impedir que un atacante comprenda el contenido del mensaje aunque lo intercepte.
 
-**Desventajas:**
-- la clave debe compartirse antes del intercambio;
-- la gestión de claves puede ser complicada;
-- si la clave se compromete, todo el sistema queda expuesto.
+- Se usa para ocultar el contenido del mensaje desde el punto de vista del atacante.
+- En la criptografía simétrica, se usa la misma clave para cifrar y descifrar.
+- En la asimétrica, se usa la clave pública del destinatario para cifrar y su clave privada para descifrar.
 
-**Ejemplos típicos**: AES, DES (obsoleto), Blowfish.
+### 5.2 Funciones hash
 
-**Caso de uso habitual**: cifrado de archivos grandes o tráfico de datos a gran escala.
+Una función hash transforma cualquier entrada en una salida de longitud fija, conocida como digest o valor hash. El proceso es determinista y no reversible en la práctica.
 
-### 5.2 Criptografía asimétrica
+- Se usan para verificar integridad de archivos, mensajes y contraseñas.
+- Si cambia un solo bit del contenido original, el hash cambia de forma muy distinta.
+- No permiten recuperar el mensaje original a partir del valor hash.
 
-• En la criptografía asimétrica se utiliza un par de claves:
-  • una clave pública, que puede distribuirse libremente.
-  • una clave privada, que debe mantenerse secreta.
-• Esto permite resolver el problema de la distribución de claves que aparece en los sistemas simétricos.
+### 5.3 MAC (Message Authentication Code)
 
-**Ventajas:**
-- no requiere compartir la clave privada;
-- permite autenticación e intercambio seguro de claves;
-- facilita la firma digital.
+Un MAC permite comprobar la integridad y la autenticidad de un mensaje entre dos entidades que comparten una clave secreta. Es decir, confirma que el mensaje no ha sido modificado y que procede de quien posee la clave compartida.
 
-**Desventajas:**
-- suele ser más lenta que la simétrica;
-- la gestión de certificados y confianza puede ser más compleja.
+- Se utiliza cuando existe una clave compartida entre emisor y receptor.
+- Protege frente a modificaciones no autorizadas del mensaje.
+- No es lo mismo que una firma digital, porque la verificación exige compartir la clave secreta.
 
-**Ejemplos**: RSA, ECC, ElGamal.
+### 5.4 Firmas digitales
 
-**Caso de uso habitual**: firma digital, autenticación y establecimiento de claves seguras.
+Una firma digital permite demostrar que un mensaje ha sido firmado por la persona que afirma ser su autor y que el contenido no ha sido alterado desde la firma. Se basa en un par de claves: pública y privada.
 
-### 5.3 Criptografía híbrida
+- La clave privada firma el mensaje o su resumen.
+- La clave pública valida la firma.
+- Proporcionan autenticidad, integridad y, en muchos contextos, no repudio.
 
-• La criptografía híbrida combina ambas opciones.
-• Por ejemplo, se usa una clave simétrica para cifrar el contenido y una clave asimétrica para proteger la clave simétrica.
+### 5.5 Intercambio o acuerdo de claves
 
-**Ejemplo práctico**: cuando dos interlocutores desean intercambiar un documento confidencial, primero acuerdan una clave simétrica de forma segura mediante un protocolo asimétrico y luego cifran el documento con esa clave.
+El intercambio o acuerdo de claves permite que dos partes establezcan un secreto compartido sin enviar ese secreto directamente por el canal de comunicación.
 
-> Esta es una de las soluciones más habituales en protocolos modernos como TLS/SSL.
+- Diffie-Hellman es el ejemplo clásico de protocolo de acuerdo de claves.
+- Ambas partes calculan un valor común sin revelarlo en claro.
+- En la práctica, se combina con autenticación para evitar ataques de intermediario.
 
-### 5.4 Comparación rápida
+### Resumen práctico
 
-| Tipo | Claves | Velocidad | Uso principal | Ventaja | Desventaja |
-|---|---|---:|---|---|---|
-| Simétrica | 1 secreta | Alta | Cifrado de contenido | Rápida | Distribución de claves |
-| Asimétrica | 2 (pública y privada) | Media/baja | Intercambio de claves y firma | Sin compartir clave privada | Más lenta |
-| Híbrida | Mixta | Alta | Protocolos seguros actuales | Equilibrio entre seguridad y rendimiento | Más compleja |
+El cifrado protege la confidencialidad del contenido; los hashes ayudan a detectar cambios; los MAC autentican mensajes compartiendo una clave; las firmas digitales permiten demostrar origen e integridad; y el acuerdo de claves permite crear secretos compartidos sin enviarlos directamente.
 
 ---
 
-## 6. Conceptos básicos de la criptografía
+## 6. Hash frente a cifrado
 
-### 6.1 Texto claro y texto cifrado
+Es importante distinguir claramente entre hash y cifrado. El cifrado es reversible: con la clave adecuada se puede recuperar el mensaje original. La función hash no es reversible en la práctica: a partir del hash no se debe poder recuperar el contenido original.
 
-• **Texto claro**: información original y legible para un ser humano o para un sistema.
-• **Texto cifrado**: resultado del proceso de cifrado, normalmente incomprensible sin la clave correcta.
+**Ejemplo**: `'Hola' -> SHA-256 -> digest`. Esto no significa que el digest sea una versión cifrada de "Hola"; simplemente es una huella digital del contenido. Si se cambia una sola letra, el hash cambia por completo.
 
-### 6.2 Clave criptográfica
-
-• Una clave es un valor matemático o secreto que permite realizar el proceso de cifrado y descifrado.
-• La seguridad del sistema depende generalmente de la longitud, la calidad y la gestión de la clave.
-
-### 6.3 Algoritmo criptográfico
-
-• Un algoritmo es la función matemática o procedimiento que transforma el mensaje.
-• Puede ser simétrico, asimétrico o híbrido.
-
-### 6.4 Función hash
-
-• Una función hash transforma un conjunto de datos de longitud variable en una secuencia fija.
-• La salida se conoce como *hash* o *digest*.
-
-**Ejemplo**: SHA-256 genera una suma de 256 bits a partir de cualquier entrada.
-
-**Propiedades esenciales**:
-- determinista: la misma entrada siempre produce el mismo hash;
-- rápida de calcular;
-- resistente a colisiones: es difícil encontrar dos mensajes distintos con el mismo hash;
-- no reversible: a partir del hash no suele ser viable recuperar el mensaje original.
-
-**Aplicaciones**:
-- comprobación de integridad;
-- almacenamiento seguro de contraseñas;
-- firma digital;
-- verificación de archivos.
-
-### 6.5 Firma digital
-
-- Una firma digital permite asegurar la autenticidad y la integridad de un documento o mensaje.
-- Se genera usando la clave privada del emisor y se verifica usando la clave pública asociada.
-
-**Ventajas**:
-- autentica al remitente;
-- permite verificar que el contenido no ha sido alterado;
-- facilita el no repudio.
-
-**Ejemplo**: un contrato firmado digitalmente no puede ser rechazado por el firmante alegando que no lo envió.
+| Mecanismo | ¿Se puede recuperar el mensaje original? | ¿Usa clave? | Uso principal |
+|---|---|---|---|
+| Cifrado | Sí | Sí | Confidencialidad |
+| Hash | No | No | Integridad y construcción de primitivas |
+| MAC | No | Sí | Integridad y autenticidad |
+| Firma digital | No | Sí, par público/privado | Autenticidad e integridad |
 
 ---
 
-## 7. Fundamentos matemáticos básicos
+## 7. Criptografía simétrica
 
-La criptografía moderna está profundamente apoyada en conceptos matemáticos. Aunque no necesitamos proponer un tratado completo, sí resulta útil comprender algunos pilares básicos.
+La criptografía simétrica utiliza una sola clave compartida entre el emisor y el receptor. Es rápida y eficiente para cifrar grandes volúmenes de datos, por lo que se usa mucho para proteger el contenido de mensajes o archivos.
 
-### 7.1 Aritmética modular
+AES es uno de los algoritmos simétricos más relevantes. Se trata de un cifrado por bloques, no de un sistema completo por sí solo para cifrar cualquier flujo de datos de forma directa. En la práctica, se combina con modos de operación como ECB, CBC, CTR y GCM.
 
-La aritmética modular consiste en operar con restos de la división. Por ejemplo:
+ECB es un modo muy simple, pero problemático: bloques iguales producen bloques cifrados iguales. Eso puede revelar patrones en el contenido cifrado. CBC y CTR mejoran esa situación, y GCM combina cifrado con autenticación, proporcionando confidencialidad, integridad y autenticidad del texto cifrado.
+
+El cifrado autenticado o **AEAD** (Authenticated Encryption with Associated Data) es una de las grandes ideas de la criptografía moderna. Ejemplos claros incluyen AES-GCM y ChaCha20-Poly1305. En estos sistemas se protege la confidencialidad y la integridad del mensaje de forma conjunta.
+
+Los nonces, IVs y la aleatoriedad son elementos críticos. El mismo nonce no debe reutilizarse con la misma clave en esquemas como GCM. La buena gestión de claves, nonces y valores aleatorios es tan importante como el algoritmo escogido.
+
+---
+
+## 8. Criptografía asimétrica
+
+La criptografía asimétrica se basa en un par de claves. La clave pública se puede distribuir libremente, mientras que la clave privada debe mantenerse en secreto. Es la base de la autenticación y del intercambio seguro de claves.
+
+El cifrado con clave pública permite que el destinatario reciba un mensaje que solo él pueda descifrar con su clave privada. La firma digital permite que el emisor firme un mensaje con su clave privada y que cualquier usuario valide la firma con la clave pública asociada.
+
+Los principales métodos asimétricos incluyen RSA, ECC y ElGamal. Si bien RSA es muy conocido y ampliamente usado, ECC ofrece un nivel de seguridad equivalente con claves mucho más pequeñas, por lo que es especialmente relevante en dispositivos móviles, sistemas embebidos y protocolos modernos.
+
+Es fundamental distinguir entre tres usos diferentes: cifrado de clave pública, firma digital y acuerdo de claves. No todos se resuelven con la misma operación ni con la misma lógica interna.
+
+> RSA y ECC se desarrollan con detalle matemático y ejemplos completos en la Sesión 2.
+
+---
+
+## 9. Firmas digitales y la explicación correcta
+
+La firma digital no es simplemente "cifrar el hash con la clave privada" de forma mecánica. La mejor forma de entenderla es como una operación criptográfica que se calcula sobre un mensaje, normalmente sobre un hash del mismo, usando la clave privada. La verificación se hace con la clave pública correspondiente.
+
+Este enfoque permite verificar dos cosas: que el emisor era quien decía ser y que el mensaje no ha sido alterado desde la firma. Modelos modernos incluyen RSA-PSS, Ed25519 y ECDSA. La clave es que la firma digital aporta autenticidad e integridad, no solo ocultación.
+
+En otras palabras, la firma digital es un mecanismo de prueba criptográfica de que el mensaje procede del emisor correcto y de que el contenido es el mismo que el que se firmó originalmente.
+
+---
+
+## 10. Diffie-Hellman y el acuerdo de claves
+
+Diffie-Hellman es un protocolo clave para establecer un secreto compartido sin enviar ese secreto directamente por el canal. Alice y Bob acuerdan públicamente un valor $p$ y un generador $g$.
+
+Alice elige un valor secreto $a$ y calcula:
 
 $$
-17 \equiv 2 \pmod{5}
+A = g^a \pmod{p}
 $$
 
-porque $17 = 3 \cdot 5 + 2$.
-
-Esto significa que 17 y 2 son congruentes módulo 5.
-
-**Ejemplo simple**:
+Bob elige $b$ y calcula:
 
 $$
-29 \equiv 9 \pmod{10}
+B = g^b \pmod{p}
 $$
 
-porque 29 al dividir entre 10 deja resto 9.
-
-**Importancia**: la aritmética modular se usa en muchos algoritmos criptográficos, especialmente en RSA, ECC y protocolos de intercambio de claves.
-
-### 7.2 Congruencias
-
-Dos números $a$ y $b$ son congruentes módulo $n$ si tienen el mismo resto al dividirlos entre $n$.
+Ambos intercambian $A$ y $B$. Luego Alice calcula $K = B^a \pmod{p}$ y Bob calcula $K = A^b \pmod{p}$. Ambos obtienen el mismo valor:
 
 $$
-a \equiv b \pmod{n}
+K = g^{ab} \pmod{p}
 $$
+
+Este mecanismo es muy útil, pero por sí solo no autentica a Alice ni a Bob. Sin autenticación, un atacante puede montarse en el medio y realizar un ataque de intermediario. Por eso, en la práctica, Diffie-Hellman se combina con autenticación, certificados o mecanismos similares.
+
+---
+
+## 11. Fundamentos matemáticos para la criptografía
+
+La criptografía moderna se apoya en herramientas matemáticas como la aritmética modular, la teoría de números, la exponenciación modular, el inverso modular, el máximo común divisor, la factorización y el logaritmo discreto.
+
+La congruencia es la base de estos sistemas: $a \equiv b \pmod{n}$ significa que $a$ y $b$ tienen el mismo resto al dividir entre $n$.
 
 **Ejemplo**:
-
-$$
-14 \equiv 4 \pmod{10}
-$$
-
-ya que $14 = 1 \cdot 10 + 4$.
-
-### 7.3 Números primos
-
-Un número primo es un entero mayor que 1 con exactamente dos divisores: 1 y él mismo. Algunos ejemplos son 2, 3, 5, 7, 11, 13, ...
-
-Los números primos son fundamentales, porque muchos sistemas criptográficos se basan en la dificultad de factorizar números grandes que son producto de dos primos grandes.
-
-**Ejemplo**:
-
-$$
-143 = 11 \times 13
-$$
-
-La factorización de un número como 143 es sencilla; sin embargo, factorizar un número de cientos de dígitos es un problema computacional muy difícil para un ordenador clásico.
-
-### 7.4 Logaritmo discreto
-
-En algunos protocolos criptográficos, la seguridad se apoya en el problema del logaritmo discreto. En esencia, dado un grupo cíclico y un valor $g^x$, resulta muy difícil calcular $x$ si el número es grande.
-
-Este problema subyace a la seguridad de algunas implementaciones de clave pública.
-
-### 7.5 Un ejemplo sencillo con modulo y exponentes
-
-Supongamos que deseamos calcular:
-
-$$
-3^4 \pmod{5}
-$$
-
-Primero calculamos:
-
-$$
-3^4 = 81
-$$
-
-y luego:
-
-$$
-81 \equiv 1 \pmod{5}
-$$
-
-porque $81 = 16 \cdot 5 + 1$.
-
-Este tipo de operaciones es frecuente en protocolos criptográficos y en algoritmos como RSA.
-
----
-
-## 8. Métodos criptográficos modernos: RSA y ECC
-
-Dentro de la criptografía asimétrica, dos de los métodos más relevantes son el algoritmo RSA y la criptografía basada en curvas elípticas (ECC). Ambos permiten establecer autenticación, cifrado y firmas digitales, pero se apoyan en problemas matemáticos distintos.
-
-### 8.1 RSA
-
-RSA es uno de los algoritmos más conocidos de la criptografía asimétrica y fue propuesto por Rivest, Shamir y Adleman en 1977. Su seguridad se fundamenta en la dificultad de factorizar un número grande que resulta del producto de dos primos grandes.
-
-La idea básica es la siguiente:
-
-1. Se eligen dos números primos grandes $p$ y $q$.
-2. Se calcula $n = p \cdot q$.
-3. Se calcula la función totiente de Euler: $\varphi(n) = (p-1)(q-1)$.
-4. Se elige un exponente público $e$ tal que $\gcd(e, \varphi(n)) = 1$.
-5. Se calcula la clave privada $d$ como el inverso modular de $e$ modulo $\varphi(n)$:
-
-$$
-   e \cdot d \equiv 1 \pmod{\varphi(n)}
-$$
-
-Una vez generadas las claves, el cifrado y el descifrado se basan en la exponenciación modular:
-
-$$
-   c = m^e \pmod{n}
-$$
-
-$$
-   m = c^d \pmod{n}
-$$
-
-donde $m$ es el mensaje, $c$ es el texto cifrado y $n$ es el módulo público. La seguridad de RSA depende de que, aunque la clave pública se conozca, un atacante no pueda recuperar la clave privada sin factorizar $n$.
-
-**Ventajas de RSA**:
-- es muy conocido y ampliamente usado;
-- permite cifrado y firma digital;
-- se usa en muchos sistemas de infraestructura digital.
-
-**Limitaciones**:
-- requiere claves más grandes para mantener una seguridad equivalente;
-- es computacionalmente más costoso que la criptografía simétrica;
-- está siendo reemplazado parcialmente por curvas elípticas en algunos contextos modernos.
-
-### 8.2 ECC (Elliptic Curve Cryptography)
-
-La criptografía basada en curvas elípticas (ECC) utiliza propiedades matemáticas de las curvas elípticas sobre campos finitos. En lugar de depender de la factorización de números grandes como RSA, ECC se apoya en el problema del logaritmo discreto sobre curvas elípticas.
-
-El diseño de ECC se centra en puntos sobre una curva de la forma:
-
-$$
-   y^2 = x^3 + ax + b
-$$
-
-y en una operación de suma entre puntos de la curva. El número secreto de un usuario se representa como un escalar multiplicado por un punto base $G$:
-
-$$
-   Q = kG
-$$
-
-donde $k$ es la clave privada y $Q$ es la clave pública. El problema para un atacante es, dado $Q$ y $G$, recuperar $k$; esto es precisamente el problema del logaritmo discreto sobre curvas elípticas.
-
-**Ventajas de ECC**:
-- proporciona la misma seguridad que RSA con claves mucho más cortas;
-- es más eficiente en dispositivos con pocos recursos, como móviles o sensores;
-- se usa en protocolos modernos como TLS, certificados digitales y criptografía de bajo consumo.
-
-**Ejemplo de comparación**:
-- una clave RSA de 3072 bits puede ofrecer un nivel de seguridad similar al de una clave ECC de 256 bits;
-- por ello ECC es muy atractiva en sistemas móviles, blockchain, IoT y comunicaciones seguras.
-
-### 8.3 Comparación entre RSA y ECC
-
-| Algoritmo | Base matemática | Seguridad relativa | Uso típico | Ventaja principal |
-|---|---|---|---|---|
-| RSA | Factorización de enteros | Requiere claves grandes | Firmas y cifrado clásico | Muy extendido |
-| ECC | Logaritmo discreto sobre curvas elípticas | Claves más cortas para igual seguridad | TLS, móviles, IoT, blockchain | Eficiencia |
-
-### 8.4 Conclusión sobre RSA y ECC
-
-Tanto RSA como ECC son pilares de la criptografía asimétrica moderna. RSA ha sido históricamente muy importante y sigue utilizándose en muchos sistemas; ECC, sin embargo, ofrece un mejor equilibrio entre seguridad y eficiencia, por lo que hoy es muy frecuente en entornos donde el coste computacional y el tamaño de la clave son relevantes.
-
----
-
-## 9. Ejemplos prácticos
-
-### 8.1 Ejemplo 1: envío seguro de un mensaje
-
-Una empresa quiere enviar un informe confidencial a otra organización. Si usa un enfoque híbrido:
-
-1. genera una clave simétrica;
-2. cifra el archivo con esa clave simétrica;
-3. cifra la clave simétrica con la clave pública del destinatario;
-4. envía ambos elementos por red;
-5. el destinatario usa su clave privada para recuperar la clave simétrica y luego descifrar el archivo.
-
-Esto combina rapidez con seguridad en la distribución de claves.
-
-### 8.2 Ejemplo 2: verificación de integridad
-
-Una plataforma de software distribuido por Internet desea saber si un archivo se ha alterado durante la descarga. Para ello:
-
-- calcula el hash del archivo original;
-- el usuario calcula el hash del archivo recibido;
-- compara ambas cadenas.
-
-Si coinciden, la integridad se mantiene. Si no coinciden, el archivo se ha modificado.
-
-### 8.3 Ejemplo 3: firma digital
-
-Un profesor quiere firmar digitalmente un documento académico. El proceso sería:
-
-1. calcula el hash del documento;
-2. cifra ese hash con su clave privada;
-3. adjunta la firma al documento;
-4. el receptor verifica la firma con la clave pública del profesor.
-
-Si la verificación es correcta, se comprueba la autenticidad del documento y su integridad.
-
----
-
-## 9. Ejercicios propuestos con soluciones
-
-### Ejercicio 1
-
-Explica la diferencia entre criptografía simétrica y asimétrica.
-
-**Solución orientativa**:
-- La criptografía simétrica usa la misma clave para cifrar y descifrar.
-- La criptografía asimétrica usa dos claves distintas: una pública y otra privada.
-- La simétrica es más rápida, pero requiere compartir la clave de forma segura.
-- La asimétrica resuelve la distribución de claves, pero suele ser más lenta.
-
-### Ejercicio 2
-
-Calcula:
-
-$$
-23 \pmod{7}
-$$
-
-**Solución**:
-
-$$
-23 = 3 \cdot 7 + 2
-$$
-
-por tanto:
 
 $$
 23 \equiv 2 \pmod{7}
 $$
 
-### Ejercicio 3
+porque $23 = 3 \times 7 + 2$.
 
-¿Para qué sirve una función hash?
+La exponenciación modular es esencial en RSA y Diffie-Hellman. Por ejemplo:
 
-**Solución orientativa**:
-- detectar cambios en archivos;
-- verificar integridad;
-- guardar contraseñas o tokens de manera segura;
-- apoyar la firma digital.
+$$
+3^4 \bmod 5 = 1
+$$
 
-### Ejercicio 4
+porque $81 \equiv 1 \pmod{5}$. El algoritmo de Euclides y el cálculo del inverso modular preparan al estudiante para entender la generación de claves y la operación de cifrado y descifrado en sistemas asimétricos.
 
-¿En qué situación sería más apropiado usar una criptografía híbrida?
-
-**Solución orientativa**:
-- cuando se necesita cifrar grandes cantidades de datos con rapidez y, además, proteger la distribución de la clave de manera segura.
-
-### Ejercicio 5
-
-¿Para qué sirve la firma digital?
-
-**Solución orientativa**:
-- autenticar al emisor;
-- verificar la integridad del documento;
-- proteger contra el no repudio.
+Los números primos y la función $\varphi$ de Euler son también esenciales. En RSA, se toma $n = p \times q$ y se usa $\varphi(n) = (p - 1)(q - 1)$ para construir las claves. El detalle técnico puede ser guiado por la noción de que la factorización de un número grande es un problema difícil para un ordenador clásico.
 
 ---
 
-## 10. Ejemplo sencillo de cálculo con Python
+## 12. Ejemplo didáctico de RSA
 
-A continuación se muestra una pequeña demostración sencilla en Python para calcular un hash y una operación modular:
+Para entender la idea, usamos un ejemplo pequeño. Supongamos $p = 5$ y $q = 11$. Entonces:
+
+$$
+n = 5 \times 11 = 55 \qquad \varphi(n) = (5 - 1)(11 - 1) = 40
+$$
+
+Elegimos $e = 3$. Buscamos $d$ tal que $e \times d \equiv 1 \pmod{40}$. Por ejemplo, $3 \times 27 = 81 \equiv 1 \pmod{40}$. Con esto, la clave pública es $(55, 3)$ y la clave privada es $27$.
+
+Para cifrar un mensaje $m$, se usa $c = m^e \bmod n$. Para descifrar, se usa $m = c^d \bmod n$.
+
+Este ejemplo es solo educativo: en sistemas reales no se implementa RSA a mano ni sin padding seguro. Para uso real se usan esquemas como RSA-OAEP para cifrado y RSA-PSS para firmas.
+
+---
+
+## 13. Ejemplos prácticos
+
+- **Ejemplo 1**: Si Alice cifra un mensaje con la clave pública de Bob, Bob puede descifrarlo con su clave privada. Esto resuelve la confidencialidad del contenido.
+- **Ejemplo 2**: Si Alice firma un documento con su clave privada, Bob puede verificar la firma con la clave pública de Alice. Esto resuelve la autenticidad y la integridad del documento.
+- **Ejemplo 3**: Si Alice y Bob usan Diffie-Hellman sin autenticación, Eve puede actuar como intermediario y negociar un secreto distinto con cada uno. Esto muestra la importancia de autenticar las claves o identidades.
+
+Estos ejemplos ayudan a comprender que la criptografía no es solo una herramienta de ocultación, sino un conjunto de mecanismos para construir comunicaciones seguras y verificables.
+
+---
+
+## 14. Ejercicios propuestos
+
+**Ejercicio 1**: Explica la diferencia entre criptografía simétrica y asimétrica.
+Solución orientativa: la simétrica usa una misma clave para cifrar y descifrar, mientras que la asimétrica usa un par de claves públicas y privadas.
+
+**Ejercicio 2**: ¿Qué implica la expresión $23 \equiv 2 \pmod{7}$?
+Solución orientativa: ambos números tienen el mismo resto al dividir entre 7.
+
+**Ejercicio 3**: ¿Qué diferencia hay entre un hash y un cifrado?
+Solución orientativa: el cifrado es reversible y usa clave; el hash es unidireccional y sirve para integridad.
+
+**Ejercicio 4**: ¿Qué problema resuelve Diffie-Hellman?
+Solución orientativa: permite acordar una clave compartida sin enviarla directamente por el canal.
+
+**Ejercicio 5**: ¿Por qué es importante distinguir entre MAC y firma digital?
+Solución orientativa: un MAC autentica mensajes para quienes comparten la clave; la firma digital usa un par público/privado y permite verificación por terceros.
+
+---
+
+## 15. Python como apoyo didáctico
+
+Python permite introducir conceptos clave con poca complejidad. Un ejemplo sencillo de función hash y aritmética modular es el siguiente:
 
 ```python
 import hashlib
 
 mensaje = b'Hola, mundo seguro'
-hash_resultado = hashlib.sha256(mensaje).hexdigest()
-print('Hash SHA-256:', hash_resultado)
-
-valor = 23
-modulo = 7
-print('23 mod 7 =', valor % modulo)
+print(hashlib.sha256(mensaje).hexdigest())
+print(23 % 7)
+print(pow(3, 4, 5))
 ```
 
-**Salida esperada**:
-
-```text
-Hash SHA-256: <valor generado>
-23 mod 7 = 2
-```
-
-Este tipo de ejemplos ayuda a entender cómo la matemática y la computación se conectan con la seguridad de la información.
+Estos ejercicios ilustran que es posible comprobar integridad, calcular restos y trabajar con potencias modulares de forma accesible para principiantes. La clave didáctica es conectar la matemática con ejemplos de seguridad real sin perder claridad conceptual.
 
 ---
 
-## 11. Importancia de la seguridad en la era digital
+## 16. Importancia de la seguridad digital
 
-En la actualidad, la mayoría de los servicios digitales dependen de la criptografía de alguna forma. Por ejemplo:
+La criptografía es una pieza central de la seguridad digital. Sostiene servicios como la navegación web, la banca online, la gestión de credenciales, la firma de documentos, la seguridad de correos electrónicos y la autenticación en redes empresariales.
 
-- las páginas web usan HTTPS para proteger el tráfico;
-- los bancos usan autenticación y firma digital;
-- los correos electrónicos se cifran para evitar la lectura por terceros;
-- los sistemas de identidad gestionan accesos con mecanismos criptográficos.
+Sin una base criptográfica sólida, las organizaciones y los individuos quedan expuestos a robo de datos, manipulación, suplantación de identidad y fraudes digitales.
 
-Sin una base criptográfica sólida, la confianza en los servicios digitales se deteriora rápidamente.
+La seguridad real de un sistema no se logra con un único algoritmo sino mediante la combinación de objetivos de seguridad, protocolos correctos, gestión adecuada de claves, autenticación y buenas prácticas de implementación.
 
 ---
 
-## 12. Errores habituales en la práctica
+## 17. Errores comunes y buenas prácticas
 
-Es útil señalar algunos errores frecuentes que pueden comprometer la seguridad:
+Un algoritmo robusto puede resultar inseguro si se emplea de forma incorrecta. Errores frecuentes incluyen la reutilización de claves o nonces, el uso de algoritmos obsoletos, la mala gestión de contraseñas y la falta de autenticación.
 
-- usar contraseñas cortas o previsibles;
-- reutilizar la misma clave en múltiples servicios;
-- no verificar certificados digitales;
-- transmitir claves por canales inseguros;
-- usar algoritmos obsoletos;
-- almacenar hashes sin sal (salt) cuando se trata de contraseñas.
+Las buenas prácticas incluyen la generación de claves con fuentes aleatorias criptográficamente seguras, la validación de certificados, el uso de KDF para contraseñas, el uso de AEAD en protocolos modernos y la prohibición de diseñar algoritmos propios.
 
-**La seguridad no depende solo del algoritmo, sino de todo el entorno de su uso.**
+Como regla general, se recomienda utilizar librerías criptográficas revisadas y protocolos ampliamente evaluados por la comunidad, en lugar de desarrollar soluciones ad hoc.
 
 ---
 
-## 13. Conclusiones
+## 18. Conclusiones
 
-Las tres ideas principales que debe retener el estudiante de esta sesión son:
+La criptografía moderna no es solo una herramienta para ocultar mensajes, sino un conjunto de mecanismos para proteger la seguridad de la información ante ataques reales.
 
-1. La criptografía es esencial para proteger la confidencialidad, la integridad, la autenticación y el no repudio.  
-2. Existen diferentes tipos de criptografía —simétrica, asimétrica e híbrida—, cada uno con ventajas y limitaciones concretas.  
-3. La seguridad moderna no se basa solo en conceptos intuitivos, sino también en fundamentos matemáticos y en la correcta gestión de claves y protocolos.
+Los conceptos más importantes de esta sesión son la confidencialidad, la integridad, la autenticación, la gestión segura de claves y el papel del atacante en el modelo de amenaza.
 
----
-
-## 14. Bibliografía esencial
-
-[1] Stallings, W. *Cryptography and Network Security: Principles and Practice*. Pearson.  
-[2] Schneier, B. *Applied Cryptography*. Wiley.  
-[3] Katz, J. y Lindell, Y. *Introduction to Modern Cryptography*. Chapman & Hall/CRC.  
-[4] Menezes, A., van Oorschot, P. y Vanstone, S. *Handbook of Applied Cryptography*. CRC Press.  
-[5] National Institute of Standards and Technology (NIST). *Digital Identity Guidelines* y documentación técnica relacionada con estándares de seguridad y criptografía.
+Con una base sólida de matemáticas, primitivas y protocolos, el alumno puede comprender mejor la lógica que sustenta los sistemas de seguridad actuales, desde TLS hasta las firmas digitales y la protección de datos en entornos digitales.
 
 ---
 
-## 15. Bibliografía recomendada
+## 19. Bibliografía esencial
 
-- Buchmann, J. A. *Introduction to Cryptography*. Springer.  
-- Silverman, J. H. *A Friendly Introduction to Number Theory*. Pearson.  
-- Ferguson, N., Schneier, B. y Kohno, T. *Cryptography Engineering*. Wiley.  
-- Documentación oficial de TLS, X.509 y PKI para comprender la infraestructura actual de autenticación y confianza digital.
-
----
-
-## 16. Preguntas de reflexión
-
-1. ¿Por qué la confidencialidad por sí sola no garantiza la seguridad completa de un sistema?  
-2. ¿Qué diferencia existe entre ocultar un mensaje y garantizar su integridad?  
-3. ¿Qué problema resuelve la criptografía asimétrica frente a la simétrica?  
-4. ¿Por qué la gestión de claves es tan crítica en cualquier sistema criptográfico?  
-5. ¿Qué consecuencias tendría usar funciones hash débiles o algoritmos obsoletos?  
-6. ¿Qué tipos de aplicaciones cotidianas dependen directamente de la criptografía?
+- Stallings, W. *Cryptography and Network Security: Principles and Practice*. Pearson.
+- Schneier, B. *Applied Cryptography*. Wiley.
+- Katz, J. y Lindell, Y. *Introduction to Modern Cryptography*. Chapman & Hall/CRC.
+- Menezes, A., van Oorschot, P. y Vanstone, S. *Handbook of Applied Cryptography*. CRC Press.
+- National Institute of Standards and Technology (NIST). *Digital Identity Guidelines* y documentación técnica relacionada con estándares criptográficos.
 
 ---
 
-## 17. Actividad recomendada para el aula
+## 20. Bibliografía recomendada
 
-Se propone una actividad breve en parejas:
+- Buchmann, J. A. *Introduction to Cryptography*. Springer.
+- Silverman, J. H. *A Friendly Introduction to Number Theory*. Pearson.
+- Ferguson, N., Schneier, B. y Kohno, T. *Cryptography Engineering*. Wiley.
+- Documentación oficial de TLS, X.509, PKI, AES-GCM, Diffie-Hellman y protocolos de firma digital.
 
-- cada estudiante elige una aplicación cotidiana (mensajes, banca, redes sociales, almacenamiento en la nube);
-- identifica qué objetivo de seguridad es más importante en esa aplicación;
-- explica qué tipo de criptografía podría emplearse;
-- justifica si requeriría una clave simétrica, asimétrica o híbrida.
+---
 
-La intención es conectar los conceptos teóricos con casos reales del uso cotidiano de la tecnología.
+## 21. Preguntas de reflexión
 
+1. ¿Por qué no basta con cifrar un mensaje si no se autentica al interlocutor?
+2. ¿Qué diferencia hay entre confidencialidad e integridad?
+3. ¿Qué problema resuelve Diffie-Hellman y qué limita en su versión básica?
+4. ¿Por qué la gestión de claves y nonces es crítica en protocolos modernos?
+5. ¿Qué papel juega la firma digital en la seguridad de documentos y transacciones?
+6. ¿Qué ocurre si se reutiliza una clave o un nonce en un esquema como AES-GCM?
