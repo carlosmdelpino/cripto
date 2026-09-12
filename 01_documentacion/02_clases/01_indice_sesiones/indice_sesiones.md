@@ -119,146 +119,114 @@ Introducción a la criptografía: de los fundamentos a la criptografía post-cu�
 
 ---
 
-## Sesión 4. Criptografía post-cuántica
+## Sesión 4. Criptografía post-cuántica: introducción. Métodos de criptografía post-cuántica (II)
 
-### 1. ¿Qué es la criptografía post-cuántica?
-- Definición
-- Necesidad de nuevos algoritmos
-- Diferencia entre seguridad clásica y post-cuántica
+### 1. Introducción y amenaza cuántica
+- Qué significa criptografía post-cuántica
+- Impacto de Shor sobre RSA, Diffie-Hellman y ECC
+- Impacto cuadrático de Grover sobre la búsqueda exhaustiva
+- Riesgo de «recoger ahora, descifrar después»
 
-### 2. Riesgos reales y teóricos
-- Ataque de Shor sobre RSA y ECC
-- Amenaza sobre firmas digitales actuales
-- Horizonte de migración y preparación
+### 2. Familias de métodos
+- Retículos
+- Códigos correctores
+- Firmas basadas en hash
+- Otras líneas de investigación
 
-### 3. Principios de diseño de sistemas post-cuánticos
-- Resistencia a ataques cuánticos
-- Eficiencia en implementaciones reales
-- Compatibilidad con infraestructuras existentes
+### 3. Método principal: ML-KEM / Kyber
+- Qué hace un KEM y qué datos son públicos o secretos
+- Base matemática de LWE y Module-LWE
+- Generación de claves, encapsulación y desencapsulación
+- Derivación de una clave simétrica
 
-### 4. Tipos de algoritmos post-cuánticos
-- Lattice-based
-- Code-based
-- Hash-based
-- Otros enfoques emergentes
+### 4. Ejemplo y ejercicios
+- Cálculo completo de una muestra LWE pequeña
+- Encapsulación didáctica de un bit
+- Ejercicios resueltos de cálculo y razonamiento
 
-### 5. Casos de uso y escenarios reales
-- Infraestructura pública
-- Redes de comunicaciones
-- Sistemas críticos
+### 5. Python y proyecto real
+- ML-KEM con una implementación existente
+- Derivación con HKDF y cifrado con AES-GCM
+- Estructura de un sobre híbrido y gestión de claves
 
-### 6. Ejercicios prácticos
-- Comparación de paradigmas criptográficos
-- Análisis de seguridad frente a computación cuántica
-
-### 7. Conclusiones
-- La transición hacia esquemas post-cuánticos es una necesidad de futuro
-
-### 8. Bibliografía esencial
-- NIST PQC Standardization
-- Bernstein, D. J. et al.
+### 6. Fuentes esenciales
+- NIST FIPS 203
+- NIST SP 800-227
+- Open Quantum Safe / liboqs-python
 
 ---
 
-## Sesión 5. Métodos post-cuánticos: lattice-based, code-based y hash-based
+## Sesión 5. Métodos de criptografía post-cuántica (II)
 
-### 1. Lattice-based cryptography
-- Fundamentos matemáticos
-- Redes euclidianas
-- Problemas difíciles en retículos
-- Ejemplos y ventajas
+### 1. Método principal: NTRU
+- Idea de retículo expresada mediante polinomios cortos
+- Papel de la clave privada y del polinomio aleatorio
+- Diferencia entre ejemplo didáctico y parámetros seguros
 
-### 2. Code-based cryptography
-- Códigos correctores de errores
-- Base matemática del enfoque
-- Casos de uso y dificultades de implementación
+### 2. Base matemática
+- Anillos de polinomios y reducción por $x^N - 1$
+- Convolución circular
+- Coeficientes módulo $p$ y módulo $q$
+- Inversos de polinomios
 
-### 3. Hash-based cryptography
-- Fundamentos de funciones hash
-- Firmas hash-based
-- Seguridad y limitaciones
+### 3. NTRU paso a paso
+- Generación de claves $f$, $g$ y $h$
+- Cifrado con aleatoriedad
+- Centrado de coeficientes
+- Descifrado con la inversa de $f$
 
-### 4. Comparativa entre enfoques
-- Seguridad
-- Tamaño de clave
-- Rendimiento
-- Complejidad de implementación
+### 4. Ejemplo y ejercicios
+- Ejemplo completo con $N = 4$, $p = 3$ y $q = 17$
+- Cálculo de clave pública, ciphertext y mensaje recuperado
+- Ejercicios resueltos de convolución, cifrado y centrado
 
-### 5. Ejercicios prácticos
-- Comparativa de tamaños de claves
-- Evaluación de rendimiento y seguridad relativa
-- Estudio del impacto de cada enfoque
+### 5. Python y proyecto real
+- Implementación didáctica completa de la convolución y el descifrado
+- Uso experimental de NTRU mediante liboqs
+- Posición actual de NTRU frente al estándar ML-KEM
 
-### 6. Conclusiones
-- No existe una solución universal; cada enfoque tiene fortalezas y limitaciones
-
-### 7. Bibliografía esencial
-- Peikert, C.
-- D. J. Bernstein y otros trabajos sobre PQC
+### 6. Fuentes esenciales
+- Hoffstein, Pipher y Silverman
+- NTRU Round 3 Submission Package
+- NIST PQC Standardization Project
 
 ---
 
-## Sesión 6. Estandarización NIST PQC y desafíos futuros
+## Sesión 6. Métodos de criptografía post-cuántica (III). Estado actual
 
-### 1. Estado actual de la estandarización
-- Proceso del NIST
-- Algoritmos seleccionados y evaluados
-- Evolución del panorama internacional
+### 1. Firmas post-cuánticas
+- Diferencia entre firma, KEM y cifrado autenticado
+- Autenticidad, integridad y verificación pública
 
-### 2. Principales algoritmos candidatos
-- Kyber
-- Dilithium
-- Falcon
-- SPHINCS+
+### 2. Método 1: ML-DSA / Dilithium
+- Retículos y clave pública con ruido
+- Reto-respuesta y transformación Fiat-Shamir
+- Muestreo por rechazo
+- Ejemplo y ejercicios resueltos de verificación
 
-### 3. Desafíos de migración
-- Compatibilidad con sistemas existentes
-- Costes de implementación
-- Rendimiento y eficiencia
-- Política, regulación y adopción industrial
+### 3. Método 2: SLH-DSA / SPHINCS+
+- Firmas de un solo uso y árboles de Merkle
+- Camino de autenticación y raíz pública
+- Ejemplo y ejercicios resueltos con un árbol pequeño
 
-### 4. Estrategias de transición
-- migración híbrida
-- coexistencia con sistemas clásicos
-- planificación en infraestructuras críticas
+### 4. Python y proyecto real
+- Firma de JSON canónico con implementaciones existentes
+- Verificación de ML-DSA y SLH-DSA
+- Formato del sobre firmado y protección de la clave privada
 
-### 5. Perspectivas futuras
-- Criptografía cuántica y seguridad global
-- Necesidad de educación, investigación y adopción
+### 5. Estado actual a 12 de septiembre de 2026
+- FIPS 203, 204 y 205 como estándares finales
+- FN-DSA / FIPS 206 y HQC-KEM / FIPS 207 en desarrollo
+- Tercera ronda de firmas adicionales de NIST
+- Inventario criptográfico, protocolos híbridos y criptoagilidad
 
-### 6. Ejercicios prácticos
-- Plan de migración segura
-- Evaluación de riesgos por tipo de infraestructura
+### 6. Ejercicio final
+- Plan de migración de una API con ECDH y ECDSA
+- Criterios para elegir entre ML-DSA y SLH-DSA
 
-### 7. Conclusiones
-- La criptografía post-cuántica es una transición estratégica para la seguridad del futuro
-
-### 8. Bibliografía esencial
-- NIST PQC Standardization reports
-- Documento institucional y revisiones técnicas actuales
+### 7. Fuentes esenciales
+- NIST FIPS 204 y FIPS 205
+- NIST IR 8545 e IR 8610
+- NIST SP 800-227 y guía de criptoagilidad
 
 ---
-
-## Evaluación final
-
-### Examen final
-- Repaso de todos los bloques temáticos
-- Preguntas teóricas y analíticas
-- Resolución de casos de seguridad
-
-### Proyecto de aplicación
-- Trabajo final de asignatura
-- Análisis de un sistema real y su transición hacia seguridad post-cuántica
-- Presentación y defensa del proyecto
-
----
-
-## Requisito adicional para cada sesión
-
-Cada sesión deberá incluir:
-- introducción a la temática,
-- explicación teórica del contenido,
-- ejemplos prácticos,
-- ejercicios matemáticos o analíticos,
-- análisis de código o demostración básica en Python,
-- y conclusión con ideas principales.
